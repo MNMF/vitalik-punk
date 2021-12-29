@@ -1,6 +1,6 @@
-
 const deploy = async () => {
     const [deployer] = await ethers.getSigners();
+    
     console.log("deploying contract with the account:", deployer.address);
 
     const VitalikPunks = await ethers.getContractFactory("VitalikPunks");
