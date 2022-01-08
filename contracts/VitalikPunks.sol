@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./Base64.sol";
 
 contract VitalikPunks is ERC721, ERC721Enumerable {
     using Counters for Counters.Counter;
@@ -35,25 +36,26 @@ contract VitalikPunks is ERC721, ERC721Enumerable {
              "ERC721 Metadata: URI query for non existent token"
          );
 
-         string memory jsonURI = abi.encodePacked(
+         string memory jsonURI = Base64.encode(
+             abi.encodePacked('{"name": "VitalikPunks #',
+                tokenId,
+                '","description": "Vitalik Punks are randomized Avatars stored on chain to teach Dapps development on Vitalik","image":"' 
+                "// TODO: Calculate image URL",
+                '"}'
+            )
+         );
              
-             '{"name": "VitalikPunks #',
-             tokenId,
-             '","description": "Vitalik Punks are randomized Avatars stored on chain to teach Dapps development on Vitalik","image":"' 
-             "// TODO: Calculate image URL",
-             '"}'
-
-             
-             
-             
-             );
+        return string(abi.encodePacked("data:application/json;base64, ", jsonURI));
     }
+
 
 
 
     // override required 
 
-function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+function _beforeTokenTransfer(address from,
+ address to,
+  uint256 tokenId)
     internal
     override(ERC721, ERC721Enumerable)
     {
