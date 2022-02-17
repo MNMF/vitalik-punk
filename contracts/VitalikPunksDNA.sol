@@ -202,17 +202,18 @@ contract VitalikPunksDNA {
     ];
 // esta funcion es determinista y no debe ser usado en produccion
 
-    function deterministicPseudoRandomDNA(uint256 _tokenId, address _minter)
-    public
-    pure
-    returns (uint256)
-{
-    uint256 combinedParams = _tokenId + uint160(_minter);
-    bytes memory encodedParams = abi.encodePacked(combinedParams);
-    bytes32 hashedParams = keccak256 (encodedParams);
+  function deterministicPseudoRandomDNA(uint256 _tokenId, address _minter)
+        public
+        pure
+        returns (uint256)
+    {
+        uint256 combinedParams = _tokenId + uint160(_minter);
+        bytes memory encodedParams = abi.encodePacked(combinedParams);
+        bytes32 hashedParams = keccak256(encodedParams);
 
-      return uint256(hashedParams);
+        return uint256(hashedParams);
     }
+
 
 
 

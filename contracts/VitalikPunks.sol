@@ -6,26 +6,31 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Base64.sol";
+import "./VitalikPunksDNA.sol";
 
-contract VitalikPunks is ERC721, ERC721Enumerable {
+contract VitalikPunks is ERC721, ERC721Enumerable, VitalikPunksDNA {
     using Counters for Counters.Counter;
+    using Strings for uint256;
+
 
     Counters.Counter private _idCounter;
     uint256 public maxSupply;
     mapping(uint256 => uint256) public tokenDNA;
 
-    constructor () ERC721 ("VitalikPunks", "VTLKS") {
-        maxSupply = _maxSupply;
+    constructor (uint256 _maxSupply) ERC721 ("VitalikPunks", "VTLKS") {
+        maxSupply = _maxSupply; 
+        
     }
-    function mint() public{
+
+    function mint() public {
         uint256 current = _idCounter.current();
-        require(current< maxSupply, "No VitalikPunks left:(");
+        require(current < maxSupply, "No VitalikPunks left:(");
 
-        tokenDNA[current] = deterministicPseudoRandomDNA (current, msg.sender);
-        _safeMint(msg.sender, tokenId);
-        _tokenId.increment();
-
+        tokenDNA[current] = deterministicPseudoRandomDNA(current, msg.sender);
+        _safeMint(msg.sender, current);
+        _idCounter.increment();
     }
+
     function _baseURI() internal pure override returns (string memory) {
             return "https://avataaars.io/";
     }
@@ -33,9 +38,10 @@ contract VitalikPunks is ERC721, ERC721Enumerable {
     function _paramsURI(uint256 _dna) internal view returns (string memory){
         string memory params;
     {
-        params = abi.encodePacked(
+        params = string(
+            abi.encodePacked(
             "accessoriesType=",
-            getAccesoriesType(_dna),
+            getAccessoriesType(_dna),
              "&clotheColor=",
                     getClotheColor(_dna),
                     "&clotheType=",
@@ -61,7 +67,7 @@ contract VitalikPunks is ERC721, ERC721Enumerable {
                     "&skinColor=",
                     getSkinColor(_dna)
                 )
-            ;
+            );
         }
 
         return string(abi.encodePacked(params, "&topType=", getTopType(_dna)));
@@ -74,7 +80,7 @@ contract VitalikPunks is ERC721, ERC721Enumerable {
       return string(abi.encodePacked(baseURI, "?", paramsURI));
     }
 
-    function tokenURI(uint256, tokenId) 
+    function tokenURI(uint256 tokenId) 
         public
         view 
         override
@@ -86,18 +92,20 @@ contract VitalikPunks is ERC721, ERC721Enumerable {
              "ERC721 Metadata: URI query for non existent token"
          );
             uint256 dna = tokenDNA [tokenId];
-            string memory image = imageByDna(dna);
+            string memory image = imageByDNA(dna);
 
          string memory jsonURI = Base64.encode(
              abi.encodePacked('{"name": "VitalikPunks #',
-                tokenId,
-                '","description": "Vitalik Punks are randomized Avatars stored on chain to teach Dapps development on Vitalik","image":"' 
+                tokenId.toString(),
+                '","description": "Vitalik Punks are randomized Avatars stored on chain to teach Dapps development on Vitalik","image": "', 
                 image,
                 '"}'
             )
          );
              
-        return string(abi.encodePacked("data:application/json;base64, ", jsonURI));
+        return 
+        
+        string(abi.encodePacked("data:application/json;base64, ", jsonURI));
     }
 
 
@@ -121,6 +129,8 @@ function _beforeTokenTransfer(
     override(ERC721, ERC721Enumerable)
     returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return 
+        
+        super.supportsInterface(interfaceId);
     }
 }
